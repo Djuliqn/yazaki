@@ -1,0 +1,55 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.example-header {
+    min-height: 64px;
+    padding: 8px 24px 0;
+}
+
+.datepicker {
+    margin: 0 auto;
+    width: 50%;
+}
+
+.createDailyMenu {
+    margin: 0 auto;
+
+}
+
+.mat-form-field {
+    font-size: 14px;
+    width: 100%;
+}
+
+.mat-table {
+    overflow: auto;
+    max-height: 500px;
+}
+
+.form {
+    min-height: 56px;
+    max-height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 8px 24px 0;
+    font-size: 20px;
+    justify-content: space-between;
+    border-bottom: 1px solid transparent;
+}
+
+mat-cell {
+    overflow: visible;
+}
+
+.no-results {
+    display: flex;
+    justify-content: center;
+    padding: 14px;
+    font-size: 14px;
+    font-style: italic;
+}

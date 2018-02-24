@@ -1,0 +1,81 @@
+<div class="container">
+    <form [formGroup]="dailyMenuForm">
+        <br>
+        <div class="datepicker">
+            <mat-form-field>
+                <input matInput [matDatepicker]="dp" placeholder="Дата" readonly formControlName="pickedDate" (dateChange)="setDate()">
+                <mat-error *ngIf="dailyMenuForm.get('pickedDate').errors?.required">Задължително поле</mat-error>
+                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker #dp disabled="false"></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="mat-elevation-z8">
+
+            <div class="form">
+                <mat-form-field floatPlaceholder="never" color="accent">
+                    <input matInput #filter placeholder="Търсене на ястие">
+                </mat-form-field>
+            </div>
+
+            <mat-table #table [dataSource]="dataSource" matSort class="mat-cell">
+
+
+                <ng-container matColumnDef="check">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                                      (change)="$event ? selection.toggle(row.id) : null"
+                                      [checked]="selection.isSelected(row.id)"></mat-checkbox>
+                    </mat-cell>
+                </ng-container>
+
+                <!--- Note that these columns can be defined in any order.
+                      The actual rendered columns are set as a property on the row definition" -->
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Име</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
+
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>Описание</mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{row.description}}</mat-cell>
+                </ng-container>
+
+                <!-- Delete Column -->
+                <ng-container matColumnDef="delete">
+                    <mat-header-cell *matHeaderCellDef>Изтриване</mat-header-cell>
+                    <mat-cell *matCellDef="let row; let i=index;">
+                        <button class="update-delete-size"
+                                mat-raised-button color="warn"
+                                (click)="deleteItem(i, row.id, row.name, row.description)">Изтрий
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+
+            <div class="no-results" [style.display]="dataSource.renderedData.length == 0 ? '' : 'none'">
+                Няма резултати
+            </div>
+
+            <mat-paginator #paginator
+                           [length]="dataSource.filteredData.length"
+                           [pageIndex]="0"
+                           [pageSize]="10"
+                           [pageSizeOptions]="[5, 10, 25, 50, 100]"
+                           [showFirstLastButtons]="true">
+            </mat-paginator>
+        </div>
+
+        <br>
+        <div class="createDailyMenu">
+            <button mat-raised-button color="primary" [disabled]="!dailyMenuForm.valid" (click)="addDailyMenu()">Създаване</button>
+        </div>
+
+        <br>
+    </form>
+</div>

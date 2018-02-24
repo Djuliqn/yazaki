@@ -1,0 +1,15 @@
+<div class="container">
+    <h3 mat-dialog-title>Изтриване</h3>
+    <mat-dialog-content>Сигурни ли сте, че искате да изтриете записа?</mat-dialog-content>
+    <mat-dialog-content>
+        Име: {{data.name}}
+    </mat-dialog-content>
+    <mat-dialog-content>
+        Описание: {{data.description}}
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+        <button mat-raised-button color="primary" [mat-dialog-close]="1" (click)="confirmDelete()">Изтрий</button>
+        <button mat-raised-button color="warn" (click)="onNoClick()" tabindex="-1">Отказ</button>
+    </mat-dialog-actions>
+</div>
