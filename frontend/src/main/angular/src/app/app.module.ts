@@ -18,6 +18,7 @@ import { DialogErrorComponent } from './components/dialog/dialog-error/dialog-er
 import { DailyMenuComponent } from './daily-menu/daily-menu.component';
 import {OrderService} from "./daily-menu/order.service";
 import {MAT_DATE_LOCALE} from "@angular/material";
+import { DialogSuccessComponent } from './components/dialog/dialog-success/dialog-success.component';
 
 
 
@@ -29,7 +30,8 @@ import {MAT_DATE_LOCALE} from "@angular/material";
         DialogDeleteDishComponent,
         DialogEditDishComponent,
         DialogErrorComponent,
-        DailyMenuComponent
+        DailyMenuComponent,
+        DialogSuccessComponent
     ],
     imports: [
         BrowserModule,
@@ -50,7 +52,8 @@ import {MAT_DATE_LOCALE} from "@angular/material";
         DialogAddDishComponent,
         DialogDeleteDishComponent,
         DialogEditDishComponent,
-        DialogErrorComponent
+        DialogErrorComponent,
+        DialogSuccessComponent
     ],
 
     bootstrap: [AppComponent]

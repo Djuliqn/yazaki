@@ -3,7 +3,7 @@
         <br>
         <div class="datepicker">
             <mat-form-field>
-                <input matInput [matDatepicker]="dp" placeholder="Дата" readonly formControlName="pickedDate" (dateChange)="setDate()">
+                <input matInput [matDatepicker]="dp" placeholder="Дата" readonly formControlName="pickedDate">
                 <mat-error *ngIf="dailyMenuForm.get('pickedDate').errors?.required">Задължително поле</mat-error>
                 <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
                 <mat-datepicker #dp disabled="false"></mat-datepicker>
@@ -73,7 +73,9 @@
 
         <br>
         <div class="createDailyMenu">
-            <button mat-raised-button color="primary" [disabled]="!dailyMenuForm.valid" (click)="addDailyMenu()">Създаване</button>
+            <button mat-raised-button color="primary" [disabled]="!dailyMenuForm.valid" (click)="addDailyMenu()">
+                Създаване
+            </button>
         </div>
 
         <br>

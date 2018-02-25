@@ -1,26 +1,28 @@
 package com.yazaki.yazaki.ui.form;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Range;
 
 import lombok.Data;
 
 @Data
 public class DailyMenuForm {
 
-    @NotEmpty(message = "daily.menu.empty.or.null")
+    @NotEmpty(message = "{NotEmpty.dailyMenuForm.dishIds}")
     private List<Long> dishIds;
 
-    @NotNull(message = "daily.menu.date.not.null")
-    //@DateTimeFormat(pattern = "yyyy-MM-dd")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate date;
-
+	@NotNull(message = "{NotNull.dailyMenuForm.year}")
+	private Short year;
+	
+	@NotNull(message = "{NotNull.dailyMenuForm.month}")
+	@Range(min = 1, max = 12, message = "{Range.dailyMenuForm.month}")
+	private Short month;
+	
+	@NotNull(message = "{NotNull.dailyMenuForm.day}")
+	@Range(min = 1, max = 31, message = "{Range.dailyMenuForm.day}")
+	private Short day;
 }

@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {DateAdapter, MatDatepickerInputEvent, MatPaginator, MatSort} from "@angular/material";
+import {DateAdapter, MatDatepickerInputEvent, MatDialog, MatPaginator, MatSort} from "@angular/material";
 import {DishService} from "../dish/dish.service";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs/Observable";
@@ -8,6 +8,8 @@ import {OrderService} from "./order.service";
 import {SelectionModel} from "@angular/cdk/collections";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {DailyMenu} from "./daily-menu";
+import {DialogErrorComponent} from "../components/dialog/dialog-error/dialog-error/dialog-error.component";
+import {DialogSuccessComponent} from "../components/dialog/dialog-success/dialog-success.component";
 
 @Component({
     selector: 'app-daily-menu',
@@ -25,7 +27,8 @@ export class DailyMenuComponent implements OnInit {
     constructor(private dishService: DishService,
                 private httpClient: HttpClient,
                 private orderService: OrderService,
-                private adapter: DateAdapter<any>) {
+                private adapter: DateAdapter<any>,
+                private dialog: MatDialog) {
     }
 
     @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -40,6 +43,7 @@ export class DailyMenuComponent implements OnInit {
         this.paginator._intl.previousPageLabel = "Назад";
         this.loadData();
         this.adapter.setLocale('bg');
+
 
         this.dailyMenuForm = new FormGroup({
             pickedDate: new FormControl('', [Validators.required])
@@ -61,27 +65,33 @@ export class DailyMenuComponent implements OnInit {
             });
     }
 
-    setDate(): void {
-        // Set today date using the patchValue function
-        let date = new Date(this.dailyMenuForm.get('pickedDate').value._d)
+    addDailyMenu() {
+        let date = new Date(this.dailyMenuForm.get('pickedDate').value._d);
+        console.log(this.selection.selected);
 
         let year = date.getFullYear();
         let month = date.getMonth() + 1;
         let day = date.getDate();
-    }
 
-    addDailyMenu() {
-        let date = new Date(this.dailyMenuForm.get('pickedDate').value._d);
+        const dailyMenu = new DailyMenu(new Array(this.selection.selected.length), year, month, day);
 
-        console.log(this.selection.selected);
-
-        const dailyMenu = new DailyMenu(new Array(this.selection.selected.length), date);
-
-        this.selection.selected.forEach( (id, index) => {
+        this.selection.selected.forEach((id, index) => {
             dailyMenu.dishIds[index] = Number(id);
         });
 
-        this.orderService.saveDailyMenu(dailyMenu).subscribe();
+        this.orderService.saveDailyMenu(dailyMenu).subscribe(next => {
+              this.dialog.open(DialogSuccessComponent, {
+                  data: {
+                      title: "Дневно меню",
+                      message: "Успешно създадено дневно меню за дата: " + day + "." + month + "." + year
+                  }
+              })
+            },
+            error => {
+                this.dialog.open(DialogErrorComponent, {
+                    data: {message: error.error}
+                })
+            });
     }
 
 }

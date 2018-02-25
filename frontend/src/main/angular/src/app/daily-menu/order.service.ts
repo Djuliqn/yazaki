@@ -12,8 +12,8 @@ export class OrderService {
     }
 
     saveDailyMenu(dailyMenu: DailyMenu): Observable<DailyMenu> {
-        return this.http.post(this.saveDailyMenuUrl, dailyMenu);
+        return this.http.post(this.saveDailyMenuUrl, dailyMenu).pipe();
     }
 
-    
+
 }
