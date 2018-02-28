@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.datepicker {
+    margin: 0 auto;
+    width: 50%;
+}

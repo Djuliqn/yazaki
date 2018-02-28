@@ -3,6 +3,7 @@ package com.yazaki.yazaki.ui.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.validation.Valid;
 
@@ -15,19 +16,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yazaki.yazaki.domain.exception.DateIllegalArgumentException;
 import com.yazaki.yazaki.domain.exception.OrderIllegalArgumentException;
+import com.yazaki.yazaki.domain.exception.RecordNotFoundException;
 import com.yazaki.yazaki.domain.model.Dish;
 import com.yazaki.yazaki.domain.model.DishCounter;
 import com.yazaki.yazaki.domain.model.Order;
 import com.yazaki.yazaki.domain.service.dish.DishService;
 import com.yazaki.yazaki.domain.service.order.OrderService;
 import com.yazaki.yazaki.ui.form.DailyMenuForm;
+import com.yazaki.yazaki.ui.form.StatisticForm;
 
 @RestController
-@RequestMapping("/daily-menu")
 public class OrderRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderRestController.class);
@@ -41,7 +43,7 @@ public class OrderRestController {
         this.orderService = orderService;
     }
 
-    @GetMapping
+    @GetMapping("/daily-menu")
     public ResponseEntity<List<Dish>> getAllDishes() {
         logger.info("Order rest controller find all dishes");
         List<Dish> dishes = dishService.getAllDishes();
@@ -49,11 +51,12 @@ public class OrderRestController {
         return ResponseEntity.status(HttpStatus.OK).body(dishes);
     }
 
-    @PostMapping("/save")
+    @PostMapping("/daily-menu/save")
     public ResponseEntity<Void> saveDailyMenu(@RequestBody @Valid final DailyMenuForm dailyMenuForm, final BindingResult result) {
         
     	if(result.hasErrors()) {
-    		proccessErrors(result);
+    		final String errorMsg = buildErrorMsg(result);
+    		throw new OrderIllegalArgumentException(errorMsg);
     	}
     	
     	logger.info("Execute operation for saving the daily menu");
@@ -63,9 +66,27 @@ public class OrderRestController {
         
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    
+	@GetMapping("/statistics")
+	public ResponseEntity<Order> getStatisticsFromSelectedDate(@Valid final StatisticForm statisticForm, final BindingResult result) {
+		
+		if(result.hasErrors()) {
+			final String errorMsg = buildErrorMsg(result);
+			throw new DateIllegalArgumentException(errorMsg);
+		}
+		
+		final LocalDate date = LocalDate.of(statisticForm.getYear(), statisticForm.getMonth(), statisticForm.getDay());
+		final Order order = orderService.findOrderByDate(date);
 
-	private void proccessErrors(final BindingResult result) {
-		logger.error("Illegal arguments in saveDailyMenu");
+		if(Objects.isNull(order)) {
+			throw new RecordNotFoundException("Няма намерени записи за тази дата.");
+		}
+		
+		return new ResponseEntity<Order>(order, HttpStatus.OK);
+	}
+
+	private String buildErrorMsg(final BindingResult result) {
+		logger.error("Illegal arguments");
 		StringBuilder errorMessageBuilder = new StringBuilder();
 		
 		if(result.getFieldErrorCount() > 1) {
@@ -79,7 +100,7 @@ public class OrderRestController {
 			errorMessageBuilder.append(result.getFieldError().getDefaultMessage());
 		}
 		
-		throw new OrderIllegalArgumentException(errorMessageBuilder.toString());
+		return errorMessageBuilder.toString();
 	}
 
     private Order convertToOrderWithRelationShips(final DailyMenuForm dailyMenuForm) {

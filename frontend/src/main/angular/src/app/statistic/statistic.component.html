@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="datepicker">
+        <mat-form-field>
+            <input matInput [matDatepicker]="dp" placeholder="Дата" readonly>
+            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+            <mat-datepicker #dp disabled="false" (selectedChanged)="onPickedDate($event)"></mat-datepicker>
+        </mat-form-field>
+    </div>
+
+    <mat-table #table [dataSource]="dataSource" matSort class="mat-cell">
+
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Име</mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.name}}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="counter">
+            <mat-header-cell *matHeaderCellDef mat-sort-header>Брой</mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.counter}}</mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+
+    <div class="no-results" [style.display]="dataSource.data.length == 0 ? '' : 'none'">
+        Няма резултати
+    </div>
+
+    <mat-paginator #paginator
+                   [length]="dataSource.filteredData.length"
+                   [pageIndex]="0"
+                   [pageSize]="10"
+                   [pageSizeOptions]="[5, 10, 25, 50, 100]"
+                   [showFirstLastButtons]="true">
+    </mat-paginator>
+</div>

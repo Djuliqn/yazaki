@@ -1,14 +1,17 @@
 package com.yazaki.yazaki.domain.service.order;
 
-import com.yazaki.yazaki.domain.model.Order;
-
+import java.time.LocalDate;
 import java.util.List;
+
+import com.yazaki.yazaki.domain.model.Order;
 
 public interface OrderService {
 
     List<Order> getAllOrders();
 
     Order findOrderById(final Long id);
+    
+    Order findOrderByDate(final LocalDate date);
 
     Order getLastAddedOrder();
 

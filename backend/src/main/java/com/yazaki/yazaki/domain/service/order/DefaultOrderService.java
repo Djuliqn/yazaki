@@ -14,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,6 +60,11 @@ public class DefaultOrderService implements OrderService {
         }
     }
 
+	@Override
+	public Order findOrderByDate(final LocalDate date) {
+		return orderRepository.findOrderByDate(date);
+	}
+	
     @Override
     public void updateOrder(final Order order) {
         executeOperation(order, orderRepository::save, new OrderDateExistsException());
@@ -91,4 +97,6 @@ public class DefaultOrderService implements OrderService {
             throw throwedException;
         }
     }
+
+
 }

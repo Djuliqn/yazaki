@@ -12,15 +12,14 @@ import {NavBarComponent} from './components/nav-bar/nav-bar.component';
 import {DishService} from "./dish/dish.service";
 import {DialogAddDishComponent} from './components/dialog/dialog-add-dish/dialog-add-dish.component';
 import {ReactiveFormsModule} from "@angular/forms";
-import { DialogDeleteDishComponent } from './components/dialog/dialog-delete-dish/dialog-delete-dish.component';
-import { DialogEditDishComponent } from './components/dialog/dialog-edit-dish/dialog-edit-dish.component';
-import { DialogErrorComponent } from './components/dialog/dialog-error/dialog-error/dialog-error.component';
-import { DailyMenuComponent } from './daily-menu/daily-menu.component';
+import {DialogDeleteDishComponent} from './components/dialog/dialog-delete-dish/dialog-delete-dish.component';
+import {DialogEditDishComponent} from './components/dialog/dialog-edit-dish/dialog-edit-dish.component';
+import {DialogErrorComponent} from './components/dialog/dialog-error/dialog-error/dialog-error.component';
+import {DailyMenuComponent} from './daily-menu/daily-menu.component';
 import {OrderService} from "./daily-menu/order.service";
 import {MAT_DATE_LOCALE} from "@angular/material";
-import { DialogSuccessComponent } from './components/dialog/dialog-success/dialog-success.component';
-
-
+import {DialogSuccessComponent} from './components/dialog/dialog-success/dialog-success.component';
+import {StatisticComponent} from './statistic/statistic.component';
 
 @NgModule({
     declarations: [
@@ -31,7 +30,8 @@ import { DialogSuccessComponent } from './components/dialog/dialog-success/dialo
         DialogEditDishComponent,
         DialogErrorComponent,
         DailyMenuComponent,
-        DialogSuccessComponent
+        DialogSuccessComponent,
+        StatisticComponent
     ],
     imports: [
         BrowserModule,

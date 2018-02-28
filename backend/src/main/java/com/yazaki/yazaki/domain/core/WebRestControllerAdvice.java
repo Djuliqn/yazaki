@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.yazaki.yazaki.domain.exception.DateIllegalArgumentException;
 import com.yazaki.yazaki.domain.exception.DishExistsException;
 import com.yazaki.yazaki.domain.exception.DishIllegalArgumentException;
 import com.yazaki.yazaki.domain.exception.OrderDateExistsException;
@@ -49,6 +50,11 @@ public class WebRestControllerAdvice extends ResponseEntityExceptionHandler {
     
     @ExceptionHandler(OrderIllegalArgumentException.class)
     public ResponseEntity<?> handleOrderIllegalArgumentException(RuntimeException ex, WebRequest request) {
+    	return handleExceptionInternal(ex, ex.getMessage(), headers, HttpStatus.CONFLICT, request);
+    }
+    
+    @ExceptionHandler(DateIllegalArgumentException.class)
+    public ResponseEntity<?> handleDateIllegalArgumentException(RuntimeException ex, WebRequest request) {
     	return handleExceptionInternal(ex, ex.getMessage(), headers, HttpStatus.CONFLICT, request);
     }
     
