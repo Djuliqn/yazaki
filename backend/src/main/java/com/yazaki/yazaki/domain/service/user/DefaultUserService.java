@@ -1,38 +1,39 @@
 package com.yazaki.yazaki.domain.service.user;
 
 import com.yazaki.yazaki.domain.exception.RecordNotFoundException;
-import com.yazaki.yazaki.domain.exception.UsernameExistsException;
+import com.yazaki.yazaki.domain.exception.UserException;
 import com.yazaki.yazaki.domain.model.User;
+import com.yazaki.yazaki.domain.repository.AuthorityRepository;
 import com.yazaki.yazaki.domain.repository.UserRepository;
-import com.yazaki.yazaki.domain.service.role.RoleService;
+import com.yazaki.yazaki.ui.form.UserAudit;
+import io.jsonwebtoken.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Optional;
 
+@Slf4j
 @Service
-@Primary
 @Transactional
 public class DefaultUserService implements UserService {
 
     private static final String DEFAULT_USER_ROLE = "ROLE_USER";
 
-    private final UserRepository userRepository;
-    private final RoleService roleService;
+    private UserRepository userRepository;
+    private AuthorityRepository authorityRepository;
 
     @Autowired
-    public DefaultUserService(final UserRepository userRepository, final RoleService roleService) {
+    public DefaultUserService(UserRepository userRepository, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
-        this.roleService = roleService;
+        this.authorityRepository = authorityRepository;
     }
 
     @Override
@@ -41,54 +42,52 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public User findUserById(final Long id) {
-        return executeOperation(id, userRepository::findOne, new RecordNotFoundException());
-    }
-
-    @Override
-    public void saveUser(final User user) {
-        user.setRole(roleService.findRoleByAuthority(DEFAULT_USER_ROLE));
-        executeOperation(user, userRepository::save);
-    }
-
-    @Override
-    public void deleteUser(final User user) {
-        executeOperation(user, userRepository::delete);
-    }
-
-    @Override
-    public void updateUser(final User user) {
-        executeOperation(user, userRepository::save);
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(final String username) {
-        final User user = userRepository.findOneByUsername(username);
-
-        if (Objects.isNull(user)) {
-            throw new UsernameNotFoundException("Грешна самоличност.");
-        }
-
-        return user;
-    }
-
-    private void executeOperation(final User user, final Consumer<User> block) {
+    public void saveUser(User user) {
         try {
-            block.accept(user);
-        } catch (DataIntegrityViolationException exception) {
-            throw new UsernameExistsException(exception);
-        } catch (InvalidDataAccessApiUsageException exception) {
-            throw new RecordNotFoundException(exception);
+            user.setAuthority(authorityRepository.findOneByName(DEFAULT_USER_ROLE));
+            userRepository.save(user);
+        } catch(DataIntegrityViolationException ex) {
+            log.error("Username exists exception.");
+            throw new UserException("Съществува запис с това име.");
         }
     }
 
-    private User executeOperation(final Long id, final Function<Long, User> block,
-                                  final RuntimeException throwedException) {
+    @Override
+    public User updateUser(User user) {
         try {
-            return block.apply(id);
-        } catch (Exception exception) {
-            throw throwedException;
+            Assert.notNull(user);
+            return userRepository.save(user);
+        } catch(DataIntegrityViolationException ex) {
+            log.error("Username exists exception.");
+            throw new UserException("Съществува запис с това име.");
         }
+    }
+
+    @Override
+    public void deleteUserById(Long id) {
+        try {
+            userRepository.delete(id);
+        } catch (EmptyResultDataAccessException | IllegalArgumentException ex) {
+            throw new RecordNotFoundException("Потребителят не е намерен.");
+        }
+    }
+
+    @Override
+    public User findById(Long id) {
+        return userRepository.findOne(id);
+    }
+
+    @Override
+    public List<UserAudit> findAllUserAudits() {
+        return userRepository.findAllUserAudits();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> user = userRepository.findOneByUsername(username);
+
+        user.orElseThrow(() -> new UserException("Грешно потребителско име."));
+
+        return user.get();
     }
 }

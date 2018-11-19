@@ -1,26 +1,16 @@
 package com.yazaki.yazaki.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.envers.*;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
-
 @Entity
 @Table(name = "DISHES")
-@Data
 public class Dish implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -33,16 +23,52 @@ public class Dish implements Serializable {
     @Column(name = "NAME", unique = true)
     @NotNull(message = "Ястието трябва да има име.")
     @Size(min = 3, max = 30, message = "Името на ястието трябва да е между 3 и 30 символа.")
+    @Audited
     private String name;
 
     @Column(name = "DESCRIPTION")
     @NotNull(message = "Описанието на ястието не може да е празно.")
-    @Size(min = 3, max = 300, message = "Описанието на ястието трябва да е между 3 и 30 символа.")
+    @Size(min = 3, max = 200, message = "Описанието на ястието трябва да е между 3 и 200 символа.")
+    @Audited
     private String description;
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL ,mappedBy = "dish")
-    //@JsonBackReference
+    @NotAudited
     private List<DishCounter> dishCounters;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
+    }
+
+    @NotNull
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(@NotNull String description) {
+        this.description = description;
+    }
+
+    public List<DishCounter> getDishCounters() {
+        return dishCounters;
+    }
+
+    public void setDishCounters(List<DishCounter> dishCounters) {
+        this.dishCounters = dishCounters;
+    }
 
 }

@@ -1,6 +1,6 @@
 package com.yazaki.yazaki.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import com.yazaki.yazaki.ui.converter.LocalDatePersistanceConverter;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")
-@Data
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,7 +28,32 @@ public class Order implements Serializable {
     @NotNull(message = "daily.menu.date.not.null")
     private LocalDate date;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
     @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", fetch = FetchType.EAGER)
     private List<DishCounter> dishCounters;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @NotNull
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(@NotNull LocalDate date) {
+        this.date = date;
+    }
+
+    public List<DishCounter> getDishCounters() {
+        return dishCounters;
+    }
+
+    public void setDishCounters(List<DishCounter> dishCounters) {
+        this.dishCounters = dishCounters;
+    }
 }

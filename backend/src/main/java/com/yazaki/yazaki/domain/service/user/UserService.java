@@ -1,20 +1,22 @@
 package com.yazaki.yazaki.domain.service.user;
 
-import java.util.List;
-
+import com.yazaki.yazaki.domain.model.User;
+import com.yazaki.yazaki.ui.form.UserAudit;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.yazaki.yazaki.domain.model.User;
+import java.util.List;
 
 public interface UserService extends UserDetailsService {
 
     List<User> getAllUsers();
 
-    User findUserById(final Long id);
+    void saveUser(User user);
 
-    void saveUser(final User user);
+    User updateUser(User user);
 
-    void deleteUser(final User user);
+    void deleteUserById(Long id);
 
-    void updateUser(final User user);
+    User findById(Long id);
+
+    List<UserAudit> findAllUserAudits();
 }

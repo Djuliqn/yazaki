@@ -2,19 +2,21 @@ package com.yazaki.yazaki.domain.service.dish;
 
 import java.util.List;
 
+import com.yazaki.yazaki.domain.exception.YazakiException;
+import com.yazaki.yazaki.ui.form.DishAudit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.yazaki.yazaki.domain.core.MessageSourceWrapper;
 import com.yazaki.yazaki.domain.exception.DishExistsException;
-import com.yazaki.yazaki.domain.exception.DishIllegalArgumentException;
 import com.yazaki.yazaki.domain.exception.RecordNotFoundException;
 import com.yazaki.yazaki.domain.model.Dish;
 import com.yazaki.yazaki.domain.repository.DishRepository;
@@ -54,13 +56,13 @@ public class DefaultDishService implements DishService {
 		try {
 			return dishRepository.save(dish);
 
-		} catch (IllegalArgumentException ex) {
-			logger.error("Method: saveDish, ThrowedException: IllegalArgumentException perhaps objects is null");
-			throw new DishIllegalArgumentException(messageSourceWrapper.getMessage("dish.is.null"));
+		} catch (IllegalArgumentException | InvalidDataAccessApiUsageException ex) {
+			logger.error("Method: saveDish, Exception message {}: perhaps objects is null", ex.getMessage());
+			throw new YazakiException(messageSourceWrapper.getMessage("dish.is.null"));
 
 		} catch (DataIntegrityViolationException ex) {
-			logger.error("Method: saveDish, ThrowedException: DishExistsException, because of unique constraint.");
-			throw new DishExistsException(messageSourceWrapper.getMessage("dish.name.exists"));
+			logger.error("Method: saveDish, Exception message {}: because of unique constraint.", ex.getMessage());
+			throw new YazakiException(messageSourceWrapper.getMessage("dish.name.exists"));
 
 		}
 	}
@@ -69,7 +71,7 @@ public class DefaultDishService implements DishService {
 	public void deleteDish(final Dish dish) {
 		try {
 			Assert.notNull(dish, messageSourceWrapper.getMessage("dish.is.null"));
-			dishRepository.delete(dish);
+            dishRepository.delete(dish);
 		} catch (IllegalArgumentException ex) {
 
 			throw new RecordNotFoundException(ex.getMessage());
@@ -87,17 +89,27 @@ public class DefaultDishService implements DishService {
 
 		} catch (IllegalArgumentException ex) {
 			logger.error("Method: updateDish, ThrowedException: IllegalArgumentException perhaps objects is null");
-			throw new DishIllegalArgumentException(ex.getMessage());
+			throw new YazakiException(ex.getMessage());
 		}
+	}
+
+	@Override
+	public List<Dish> findDishesByIds(List<Long> dishIds) {
+		return dishRepository.findByIdIn(dishIds);
+	}
+
+	@Override
+	public List<DishAudit> findAllDishAudits() {
+		return dishRepository.findAllDishAudits();
 	}
 
 	@Override
 	public void deleteDishById(final Long id) {
 		try {
-			dishRepository.delete(id);
+            dishRepository.delete(id);
+
 		} catch (EmptyResultDataAccessException | IllegalArgumentException ex) {
-			logger.error(
-					"Method: deleteDishById, Throwed exception: RecordNotFoundException, because passes id is null or id doesnt exists.");
+			logger.error("Method: deleteDishById, Throwed exception: RecordNotFoundException, because passes id is null or id doesnt exists.");
 			throw new RecordNotFoundException(messageSourceWrapper.getMessage("dish.not.found"));
 		}
 	}
@@ -109,7 +121,7 @@ public class DefaultDishService implements DishService {
 			return;
 		}
 		
-		if (dish.getId() != foundDish.getId()) {
+		if (!dish.getId().equals(foundDish.getId())) {
 			logger.error("Method: updateDish, Unique constraint of column name.");
 			throw new DishExistsException(messageSourceWrapper.getMessage("dish.name.exists"));
 		}

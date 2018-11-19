@@ -1,6 +1,8 @@
 package com.yazaki.yazaki.domain.service.dish;
 
 import com.yazaki.yazaki.domain.model.Dish;
+import com.yazaki.yazaki.ui.form.DishAudit;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -17,4 +19,9 @@ public interface DishService {
     void deleteDishById(final Long id);
 
     Dish updateDish(final Dish dish);
+
+    List<Dish> findDishesByIds(List<Long> dishIds);
+
+
+    List<DishAudit> findAllDishAudits();
 }

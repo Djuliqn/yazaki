@@ -1,20 +1,23 @@
 package com.yazaki.yazaki.domain.model;
 
-import lombok.Data;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
+import java.io.Serializable;
 import java.util.Set;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 @Entity
 @Table(name = "USERS")
-@Data
-public class User implements UserDetails {
+public class User implements UserDetails, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -5145891056124252270L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,6 +27,7 @@ public class User implements UserDetails {
     @NotNull(message = "Моля попълнете името на потребителя.")
     @Column(name = "USERNAME", unique = true)
     @Size(min = 4, max = 20, message = "Потебителското име трябва да е между 4 и 20 символа.")
+    @Audited
     private String username;
 
     @NotNull(message = "Моля попълнете парола.")
@@ -31,8 +35,9 @@ public class User implements UserDetails {
     private String password;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ROLE_ID")
-    private Role role;
+    @JoinColumn(name = "AUTHORITY_ID")
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    private Authority authority;
 
     @NotNull
     @Column(name = "IS_ACCOUNT_NON_EXPIRED")
@@ -58,9 +63,9 @@ public class User implements UserDetails {
     }
 
     @Override
-    public Set<Role> getAuthorities() {
-        Set<Role> authorities = new HashSet<>();
-        authorities.add(role);
+    public Set<Authority> getAuthorities() {
+        Set<Authority> authorities = newHashSet();
+        authorities.add(authority);
 
         return authorities;
     }
@@ -103,12 +108,12 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public Role getRole() {
-        return role;
+    public Authority getAuthority() {
+        return authority;
     }
 
-    public void setRole(final Role role) {
-        this.role = role;
+    public void setAuthority(final Authority authority) {
+        this.authority = authority;
     }
 
     public void setUsername(final String username) {

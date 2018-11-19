@@ -7,11 +7,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "ROLES")
+@Table(name = "AUTHORITIES")
 @Data
-public class  Role implements GrantedAuthority {
-
-    private static final long serialVersionUID = 1L;
+public class Authority implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,10 +18,18 @@ public class  Role implements GrantedAuthority {
 
     @NotNull(message = "Ролята неможе да е празна.")
     @Column(name = "AUTHORITY", unique = true)
-    private String authority;
+    private String name;
+
+    public Authority() {
+
+    }
+
+    public Authority(String name) {
+        this.name = name;
+    }
 
     @Override
     public String getAuthority() {
-        return authority;
+        return name;
     }
 }

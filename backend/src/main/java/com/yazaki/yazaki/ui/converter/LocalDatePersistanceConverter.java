@@ -8,7 +8,7 @@ public class LocalDatePersistanceConverter implements AttributeConverter<LocalDa
 
     @Override
     public Date convertToDatabaseColumn(final LocalDate entityValue) {
-        return Date.valueOf(entityValue);
+         return Date.valueOf(entityValue);
     }
 
     @Override
